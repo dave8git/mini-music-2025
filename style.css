@@ -1,0 +1,105 @@
+/* ========== Global Reset and Base Styles ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #121212;
+  --header-bg: #1e1e1e;
+  --sidebar-bg: #1c1c1c;
+  --main-bg: #181818;
+  --footer-bg: #1e1e1e;
+  --text-color: #f1f1f1;
+  --accent-color: #bb86fc; /* Purple Accent */
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  user-select: none;
+  height: 100vh;
+  display: flex;
+}
+
+#app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ========== Header / Title Bar ========== */
+#title-bar {
+  background-color: var(--header-bg);
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  flex-shrink: 0;
+  border-bottom: 1px solid #333;
+}
+
+/* ========== Main Content Area (Sidebar + Main View) ========== */
+#content-area {
+  display: flex;
+  flex: 1 1 auto; /* take remaining height */
+  overflow: hidden;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  padding: 20px;
+  overflow-y: auto;
+  border-right: 1px solid #333;
+  flex-shrink: 0;
+}
+
+#sidebar p {
+  opacity: 0.8;
+}
+
+/* Main View */
+#main-view {
+  flex: 1;
+  background-color: var(--main-bg);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#main-view p {
+  opacity: 0.9;
+}
+
+/* ========== Player Controls ========== */
+#player-controls {
+  background-color: var(--footer-bg);
+  padding: 15px 20px;
+  text-align: center;
+  border-top: 1px solid #333;
+  flex-shrink: 0;
+}
+
+#player-controls p {
+  opacity: 0.9;
+}
+
+/* ========== Scrollbar Styling (Optional for beauty) ========== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #1a1a1a;
+}

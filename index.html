@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Music Player</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="app-container">
+    <header id="title-bar">
+      <h1>My Music Player</h1>
+    </header>
+    <div id="content-area">
+      <aside id="sidebar">
+        <p>Sidebar (Playlists / Library Navigation)</p>
+      </aside>
+      <main id="main-view">
+        <p>Main View (Song List / Album Art / Search)</p>
+      </main>
+    </div>
+    <div class="loader">
+        <button id="upload">Select files</button>
+    </div>
+    <footer id="player-controls">
+      <p>Player Controls (Play / Pause / Volume / Progress Bar)</p>
+    </footer>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
