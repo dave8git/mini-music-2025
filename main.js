@@ -1,4 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const fs = require('fs').promises;
+const mm = require('music-metadata');
 const path = require('path');
 
 let mainWindow;
@@ -25,7 +27,7 @@ function createWindow() {
     // Usuń obiekt window, kiedy okno zostaje zamknięte
 }
 
-ipcMain.handle('uploadFiles', async () => {
+ipcMain.handle('uploadFiles', async () => { // nasłuchuje na 'uploadFiles' 
     const { filePaths } = await dialog.showOpenDialog( // czeka na okienko dialogowe - interakcje użytkownika z oknem dialogowym
         {
             properties: ['openFile', 'multiSelections'],
@@ -34,7 +36,16 @@ ipcMain.handle('uploadFiles', async () => {
             ]
         },
     );
-    return filePaths.map(file => (file));
+    const promisesFilePaths = await Promise.all(filePaths.map((filePath) => {
+        return mm.parseFile(filePath);
+    }));
+
+    return filePaths.map((file, index) => {
+        return {
+            file, // !!! punktem styku będzie ścieżka
+            metadata: promisesFilePaths[index],
+        }
+    });
 });
 
 // handle zwraca wartość która przekazywana jest dalej (do renderer poprzez bridge)

@@ -1,18 +1,29 @@
 
 const audioElementsList = document.getElementById('sidebar');
+const musicList = document.getElementById('music-list');
+
+let fileSet = new Set(); // nie da się raz zrobić new Set(), po co powtarzać niżej w funkcji? 
 
 document.getElementById('upload').addEventListener('click', async () => {
     const files = await window.electronAPI.loadFiles(); // musi poczekać na pliki stąd await (asynchronicznie)
-    files.forEach((file) => {
-        const audioElement = document.createElement('audio');
-        audioElement.controls = true;
-        audioElement.src = file;
-        audioElementsList.appendChild(audioElement);
-    })
-
+    //fileSet.add([...files]);
     console.log('files', files);
+    addFileList(files);
+    
 });
 
+function addFileList(filesArr) {
+   musicList.innerHTML = '';
+   const musicElementArr = [];
+        files.forEach((file) => {
+        // const audioElement = document.createElement('audio');
+        // audioElement.controls = true;
+        // audioElement.src = file;
+        // audioElementsList.appendChild(audioElement);
+        musicElementArr.push(`<li>${file.metadata.common}</li>`);
+    })
+    console.log(musicElementArr);
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Renderer is working ✅');
