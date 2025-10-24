@@ -9,19 +9,19 @@ document.getElementById('upload').addEventListener('click', async () => {
     //fileSet.add([...files]);
     console.log('files', files);
     addFileList(files);
-    
 });
 
 function addFileList(filesArr) {
    musicList.innerHTML = '';
    const musicElementArr = [];
-        files.forEach((file) => {
+        filesArr.forEach((file) => {
         // const audioElement = document.createElement('audio');
         // audioElement.controls = true;
         // audioElement.src = file;
         // audioElementsList.appendChild(audioElement);
-        musicElementArr.push(`<li>${file.metadata.common}</li>`);
+        musicElementArr.push(`<li>${file.metadata.common.title}</li>`);
     })
+    musicList.innerHTML = musicElementArr;
     console.log(musicElementArr);
 }
 
