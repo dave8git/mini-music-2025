@@ -167,3 +167,37 @@ body {
 ::-webkit-scrollbar-track {
   background-color: #1a1a1a;
 }
+
+/* =========== Spinner ============= */
+
+body.in-progress::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+}
+
+/* Loader (animowane kółko) */
+body.in-progress::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+/* Animacja obrotu */
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

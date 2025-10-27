@@ -3,12 +3,54 @@ const audioElementsList = document.getElementById('sidebar');
 const musicList = document.getElementById('music-list');
 
 let fileSet = new Set(); // nie da się raz zrobić new Set(), po co powtarzać niżej w funkcji? 
+let progressStatus = 'idle';
+
+const state = { // ten obiekt obsługuje nam spinner - idle
+    _progressStatus: 'idle', 
+    set progressStatus(value) {
+        this._progressStatus = value;
+        if(value === 'idle') {
+            document.body.classList.remove('in-progress');
+        } else {
+            document.body.classList.add('in-progress');
+        }
+    },
+    get progressStatus() {
+        return this._progressStatus;
+    }
+}
+
+const notification = { // na podstawie tego obiektu getterów i setterów zrobić notyfikacje ile plików zostało wczytane.
+  _message: null,
+  set message(value) {
+    this._message = value;
+    
+    if (value) {
+      // robisz logikę wyświetlenia powiadomienia
+    }
+    
+    setTimeout(function() {
+      notification.message = null;
+    }, 3000);
+  },
+  get message() {
+    return this._message;
+  }
+}
+
+notification.message = "dodano 5 piosenek";
+
 
 document.getElementById('upload').addEventListener('click', async () => {
+    state.progressStatus = 'in-progress';
+   //progressStatus ? document.body.classList.add('hidden') : document.body.classList.add('.showSp');
     const files = await window.electronAPI.loadFiles(); // musi poczekać na pliki stąd await (asynchronicznie)
     //fileSet.add([...files]);
     console.log('files', files);
     addFileList(files);
+    state.progressStatus = 'idle';
+    const message = `Zaimportowano: ${files.length} plików muzycznych`;
+    alert(message);
 });
 
 function addFileList(filesArr) {
