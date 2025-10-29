@@ -201,3 +201,16 @@ body.in-progress::after {
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
+
+/* Liczba uploadowanych piosenek */
+.notification {
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* ensures it won't push other elements */
+  transition: opacity 0.5s ease-in-out;
+}
+
+.notification.hidden {
+    opacity: 0;
+}
