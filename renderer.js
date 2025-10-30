@@ -2,11 +2,12 @@
 const audioElementsList = document.getElementById('sidebar');
 const musicList = document.getElementById('music-list');
 const fileCount = document.getElementById('file-count');
+const clearButton = document.getElementById('clear');
 
-let fileSet = new Set(); // nie da siƒô raz zrobiƒá new Set(), po co powtarzaƒá ni≈ºej w funkcji? 
+let fileSet = new Set(); // nie da siÍ raz zrobiÊ new Set(), po co powtarzaÊ niøej w funkcji? 
 let progressStatus = 'idle';
 
-const state = { // ten obiekt obs≈Çuguje nam spinner - idle
+const state = { // ten obiekt obs≥uguje nam spinner - idle
     _progressStatus: 'idle',
     set progressStatus(value) {
         this._progressStatus = value;
@@ -21,7 +22,7 @@ const state = { // ten obiekt obs≈Çuguje nam spinner - idle
     }
 }
 
-const notification = { // na podstawie tego obiektu getter√≥w i setter√≥w zrobiƒá notyfikacje ile plik√≥w zosta≈Ço wczytane.
+const notification = { // na podstawie tego obiektu getterÛw i setterÛw zrobiÊ notyfikacje ile plikÛw zosta≥o wczytane.
     _message: null,
     set message(value) {
         this._message = value;
@@ -35,7 +36,7 @@ const notification = { // na podstawie tego obiektu getter√≥w i setter√≥w zrobiƒ
             }, 2000);
 
             setTimeout(() => {
-                fileCount.textContent = ''; // ca≈Çkowite wyczyszczenie po zaniku
+                fileCount.textContent = ''; // ca≥kowite wyczyszczenie po zaniku
             }, 2500);
         }
     },
@@ -46,37 +47,58 @@ const notification = { // na podstawie tego obiektu getter√≥w i setter√≥w zrobiƒ
 
 document.getElementById('upload').addEventListener('click', async () => {
     state.progressStatus = 'in-progress';
-    //progressStatus ? document.body.classList.add('hidden') : document.body.classList.add('.showSp');
-    const files = await window.electronAPI.loadFiles(); // musi poczekaƒá na pliki stƒÖd await (asynchronicznie)
-    //fileSet.add([...files]);
+    const files = await window.electronAPI.loadFiles(); // musi poczekaÊ na pliki st±d await (asynchronicznie)
     console.log('files', files);
     addFileList(files);
     state.progressStatus = 'idle';
-    notification.message = `Zaimportowano: ${files.length} plik√≥w muzycznych`;
+    notification.message = `Zaimportowano: ${files.length} plikÛw muzycznych`;
 });
 
-function addFileList(filesArr) {
+clearButton.addEventListener('click', () => {
+
     musicList.innerHTML = '';
-    const musicElementArr = [];
-    filesArr.forEach((file) => {
-        // const audioElement = document.createElement('audio');
-        // audioElement.controls = true;
-        // audioElement.src = file;
-        // audioElementsList.appendChild(audioElement);
-        musicElementArr.push(`<li>${file.metadata.common.title}</li>`);
+    fileSet.clear();
+    notification.message = 'Lista zosta≥a wyczyszczona ??';
+    setTimeout(() => {
+        notification.message = 'Hey dodaj jakie∂ piosenki... bo tak jako∂ pusto na tej playli∂cie ?? ??';
+    }, 3000);
+});
+
+function addFileList(filesArr) { 
+    filesArr.forEach((file) => { // forEach wype≥nia fileSeta, øeby pozbyc sie duplikatÛw
+        fileSet.add(file.file); 
+    });
+    const fragment = document.createDocumentFragment(); // tworzy fragment bÍdzie w pamiÍci kontenerem dla piosenke
+    [...fileSet].map((filePath) => { // przechodzi po fileSet, po kolei przez wszystkie scieøki w fileSet
+        const liItem = document.createElement('li'); // tworzy element li
+        const currentFile = filesArr.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek ktÛry rÛwna siÍ obecnej ∂cieøce z fileSet
+        liItem.innerHTML = currentFile.metadata.common.title; // filesArr pochodzi z maina z piosenkami a filePath to ∂cieøka unikalna
+        liItem.dataset.filePath = filePath;
+        fragment.appendChild(liItem); // dodaje item LI do fragment
+    });
+
+    musicList.appendChild(fragment); // po mapie dodaje wszystkie piosenki ktÛre sa teraz we frgamencie do musicList
+    musicList.addEventListener('click', (e) => { // dodaje eventListner do
+        if (e.target.tagName === 'LI') {
+            console.log(e.target.dataset.filePath);
+        }
     })
-    musicList.innerHTML = musicElementArr;
-    console.log(musicElementArr);
+
+    // dodaÊ audio w HTML, z≥apaÊ je, i dodaÊ SRC ∂cieøkÍ
+}
+
+function play(filePath) {
+
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Renderer is working ‚úÖ');
+    console.log('Renderer is working ?');
 
     if (window.electronAPI) {
-        console.log('Electron API jest dostƒôpne:', window.electronAPI);
+        console.log('Electron API jest dostÍpne:', window.electronAPI);
         console.log('Nazwa aplikacji w pliku preload.js to:', window.electronAPI.appName);
     } else {
-        console.log('‚ùå Brak skonfigurowanego electronAPI. Sprawd≈∫ plik preload tam wpis webPreferences.');
+        console.log('? Brak skonfigurowanego electronAPI. Sprawdº plik preload tam wpis webPreferences.');
     }
 
     const titleBar = document.getElementById('title-bar');

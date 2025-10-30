@@ -214,3 +214,38 @@ body.in-progress::after {
 .notification.hidden {
     opacity: 0;
 }
+
+/* clear songs button */
+#clear {
+  background-color: #e74c3c; /* red base color */
+  color: var(--text-color);
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 20px auto;
+  display: block;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+#clear:hover {
+  background-color: #ff6655;
+  transform: scale(1.05);
+}
+
+#clear:active {
+  background-color: #c0392b;
+  transform: scale(0.97);
+}
+
+/* Align both buttons horizontally */
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
