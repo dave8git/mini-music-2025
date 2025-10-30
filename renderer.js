@@ -35,7 +35,7 @@ const notification = { // na podstawie tego obiektu getterów i setterów zrobi�
             }, 2000);
 
             setTimeout(() => {
-                fileCount.textContent = ''; // caowite wyczyszczenie po zaniku
+                fileCount.textContent = ''; // całkowite wyczyszczenie po zaniku
             }, 2500);
         }
     },
