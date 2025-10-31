@@ -2,7 +2,7 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const fs = require('fs').promises;
 const mm = require('music-metadata');
 const path = require('path');
-
+const { pathToFileURL } = require('url');
 let mainWindow;
 
 function createWindow() {
@@ -16,6 +16,7 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
+            sandbox: true
         }
     });
 
@@ -48,10 +49,15 @@ ipcMain.handle('uploadFiles', async () => { // nasłuchuje na 'uploadFiles'
     });
 });
 
+
 // handle zwraca wartość która przekazywana jest dalej (do renderer poprzez bridge)
 // on tylko nasłuchuje i przekazuje
 
 app.on('ready', createWindow);
+
+ipcMain.handle('get-file-url', (_, filePath) => {
+    return pathToFileURL(filePath).href;
+});
 
 // Kiedy wszystkie okna zostaną zakończ działanie aplikacji (no chyba, że aplikacja działa na macu)
 app.on('window-all-closed', () => {
