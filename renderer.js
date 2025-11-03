@@ -4,7 +4,7 @@ const musicList = document.getElementById('music-list');
 const fileCount = document.getElementById('file-count');
 const clearButton = document.getElementById('clear');
 const audioPlayer = document.getElementById('audioPlayer');
-let musicLiberary = [];
+let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 let progressStatus = 'idle';
 
@@ -70,7 +70,7 @@ function addFileList(filesArr) {
         const filePath = file.file;
         if(!fileSet.has(filePath)) {
             fileSet.add(filePath);
-            musicLiberary.push({
+            musicLibrary.push({
                 file: filePath,
                 metadata: file.metadata
             })
@@ -78,9 +78,11 @@ function addFileList(filesArr) {
     });
     musicList.innerHTML = '';
     const fragment = document.createDocumentFragment(); // tworzy fragment b?dzie w pami?ci kontenerem dla piosenke
+    console.log('fileSet', fileSet);
+    console.log('fileSet2', [...fileSet]);
     [...fileSet].map((filePath) => { // przechodzi po fileSet, po kolei przez wszystkie scie?ki w fileSet
         const liItem = document.createElement('li'); // tworzy element li
-        const currentFile = filesArr.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek kt?ry r?wna si? obecnej ?cie?ce z fileSet
+        const currentFile = musicLibrary.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek kt?ry r?wna si? obecnej ?cie?ce z fileSet
         liItem.innerHTML = currentFile.metadata.common.title; // filesArr pochodzi z maina z piosenkami a filePath to ?cie?ka unikalna
         liItem.dataset.filePath = filePath;
         fragment.appendChild(liItem); // dodaje item LI do fragment

@@ -37,10 +37,11 @@ ipcMain.handle('uploadFiles', async () => { // nasłuchuje na 'uploadFiles'
             ]
         },
     );
+    console.log('filePaths', filePaths);
     const promisesFilePaths = await Promise.all(filePaths.map((filePath) => {
         return mm.parseFile(filePath);
     }));
-
+    console.log('promisesFilePaths', promisesFilePaths);
     return filePaths.map((file, index) => {
         return {
             file, // !!! punktem styku będzie ścieżka
