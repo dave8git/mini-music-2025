@@ -108,6 +108,12 @@ body {
   transform: scale(0.97);
 }
 
+/* PlayPauseButton */
+
+.play-pause-btn {
+  
+}
+
 /* ========== Song List Items ========== */
 .song-item {
   padding: 12px 16px;
@@ -248,4 +254,32 @@ body.in-progress::after {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+/* Player buttons and player display */
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+#now-playing {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.music-note {
+  margin-right: 0.5rem;
+}
+
+#volume-slider {
+  width: 150px;
+}
+
+/* selected song */
+.greenText {
+  color: green;
 }

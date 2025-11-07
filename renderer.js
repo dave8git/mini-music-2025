@@ -4,6 +4,9 @@ const musicList = document.getElementById('music-list');
 const fileCount = document.getElementById('file-count');
 const clearButton = document.getElementById('clear');
 const audioPlayer = document.getElementById('audioPlayer');
+const playPauseBtn = document.getElementById('play-pause-btn');
+const stopBtn = document.getElementById('stop-btn');
+const volumeSlider = document.getElementById('volume-slider');
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 let progressStatus = 'idle';
@@ -65,10 +68,10 @@ clearButton.addEventListener('click', () => {
     }, 3000);
 });
 
-function addFileList(filesArr) { 
+function addFileList(filesArr) {
     filesArr.forEach((file) => { // forEach wype?nia fileSeta, ?eby pozbyc sie duplikat?w
         const filePath = file.file;
-        if(!fileSet.has(filePath)) {
+        if (!fileSet.has(filePath)) {
             fileSet.add(filePath);
             musicLibrary.push({
                 file: filePath,
@@ -78,32 +81,76 @@ function addFileList(filesArr) {
     });
     musicList.innerHTML = '';
     const fragment = document.createDocumentFragment(); // tworzy fragment b?dzie w pami?ci kontenerem dla piosenke
-    console.log('fileSet', fileSet);
-    console.log('fileSet2', [...fileSet]);
+
     [...fileSet].map((filePath) => { // przechodzi po fileSet, po kolei przez wszystkie scie?ki w fileSet
         const liItem = document.createElement('li'); // tworzy element li
         const currentFile = musicLibrary.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek kt?ry r?wna si? obecnej ?cie?ce z fileSet
         liItem.innerHTML = currentFile.metadata.common.title; // filesArr pochodzi z maina z piosenkami a filePath to ?cie?ka unikalna
         liItem.dataset.filePath = filePath;
+        liItem.dataset.fileSong = cleanUpFileURL(filePath);
         fragment.appendChild(liItem); // dodaje item LI do fragment
     });
 
+    const firstSong = fileSet.values().next().value; // przy inicjalizacji listy wrzucamy playerowi pierwsz± zaczytan± ¶cie¿kê (piosenkê)
+    audioPlayer.src = firstSong; // teraz bêzie gra³ jak go siê wywo³a w³asnie tê piosenkê. 
+    audioPlayer.dataset.currentSong = cleanUpFileURL(firstSong);
     musicList.appendChild(fragment); // po mapie dodaje wszystkie piosenki kt?re sa teraz we frgamencie do musicList
-    musicList.addEventListener('click', async (e) => { // dodaje eventListner do
-        if (e.target.tagName === 'LI') {
-            //console.log(e.target.dataset.filePath);
-            const songURL = await window.electronAPI.getFileURL(e.target.dataset.filePath);
-            audioPlayer.src = songURL;
-            audioPlayer.play();
-        }
-    })
-
     // doda? audio w HTML, z?apa? je, i doda? SRC ?cie?k?
-}
+};
+
+musicList.addEventListener('click', async (e) => { // dodaje eventListner do
+    if (e.target.tagName === 'LI') {
+        //console.log(e.target.dataset.filePath);
+        const songURL = await window.electronAPI.getFileURL(e.target.dataset.filePath);
+        audioPlayer.src = songURL;
+        audioPlayer.dataset.currentSong = cleanUpFileURL(e.target.dataset.filePath);
+        audioPlayer.play();
+
+        document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
+        e.target.classList.add('greenText');
+    }
+});
+
+function cleanUpFileURL(s) {
+    return s.replaceAll("/", "_").replaceAll(":", "").replaceAll(" ", "_").replaceAll("\\", "_").replaceAll(".", "");
+};
+
+playPauseBtn.addEventListener('click', async () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseBtn.innerText = 'Pause';
+        const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+        activeSong.classList.add('greenText');
+    } else {
+        audioPlayer.pause();
+        playPauseBtn.innerText = 'Play';
+    }
+});
 
 function play(filePath) {
 
 }
+
+audioPlayer.addEventListener('ended', () => {
+    stopPlayback();
+});
+
+function stopPlayback() {
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+};
+
+audioPlayer.addEventListener('error', (e) => {
+    console.error('Playback error:', e);
+});
+
+volumeSlider.addEventListener('input', (e) => {
+    audioPlayer.volume = e.target.value / 100;
+    console.log('volumeSlider moved');
+});
+
+audioPlayer.volume = 0.5;
+volumeSlider.value = 50;
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Renderer is working ?');
