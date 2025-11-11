@@ -7,6 +7,7 @@ const audioPlayer = document.getElementById('audioPlayer');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const stopBtn = document.getElementById('stop-btn');
 const volumeSlider = document.getElementById('volume-slider');
+const songTitle = document.getElementById('song-title');
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 let progressStatus = 'idle';
@@ -106,8 +107,17 @@ musicList.addEventListener('click', async (e) => { // dodaje eventListner do
         audioPlayer.dataset.currentSong = cleanUpFileURL(e.target.dataset.filePath);
         audioPlayer.play();
 
-        document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
+        document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText')); // przechodzi po wszystkich elementach i usuwa klasê greentext
         e.target.classList.add('greenText');
+    }
+    const currentSongData = musicLibrary.find(
+        song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
+    );
+
+    if (currentSongData && currentSongData.metadata?.common) {
+        songTitle.innerText = currentSongData.metadata.common.title;
+    } else {
+        songTitle.innerText = 'Uknown Title';
     }
 });
 
@@ -120,16 +130,21 @@ playPauseBtn.addEventListener('click', async () => {
         audioPlayer.play();
         playPauseBtn.innerText = 'Pause';
         const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+        const currentSongData = musicLibrary.find(
+            song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
+        );
+        if(currentSongData && currentSongData.metadata?.common?.title) {
+            songTitle.innerText = currentSongData.metadata.common.title;
+        } else {
+            songTitle.innerText = 'Unknown title';
+        }
         activeSong.classList.add('greenText');
     } else {
         audioPlayer.pause();
         playPauseBtn.innerText = 'Play';
+         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
     }
 });
-
-function play(filePath) {
-
-}
 
 audioPlayer.addEventListener('ended', () => {
     stopPlayback();
