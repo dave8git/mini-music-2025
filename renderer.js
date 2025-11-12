@@ -99,6 +99,22 @@ function addFileList(filesArr) {
     // doda? audio w HTML, z?apa? je, i doda? SRC ?cie?k?
 };
 
+function updateSongDisplay() {
+    const currentSongData = musicLibrary.find(
+        song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
+    );
+
+    if(currentSongData && currentSongData.metadata?.common) {
+        songTitle.innerText = currentSongData.metadata.common.title;
+    } else {
+        songTitle.innerText = 'Uknown Title';
+    };
+
+    document.querySelectorAll('@music-list li').forEach(li => li.classList.remove('greenText'));
+    const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+    if (activeSong) activeSong.classList.add('greenText');
+};
+
 musicList.addEventListener('click', async (e) => { // dodaje eventListner do
     if (e.target.tagName === 'LI') {
         //console.log(e.target.dataset.filePath);
@@ -109,15 +125,7 @@ musicList.addEventListener('click', async (e) => { // dodaje eventListner do
 
         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText')); // przechodzi po wszystkich elementach i usuwa klasê greentext
         e.target.classList.add('greenText');
-    }
-    const currentSongData = musicLibrary.find(
-        song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
-    );
-
-    if (currentSongData && currentSongData.metadata?.common) {
-        songTitle.innerText = currentSongData.metadata.common.title;
-    } else {
-        songTitle.innerText = 'Uknown Title';
+        updateSongDisplay();
     }
 });
 
@@ -130,15 +138,7 @@ playPauseBtn.addEventListener('click', async () => {
         audioPlayer.play();
         playPauseBtn.innerText = 'Pause';
         const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
-        const currentSongData = musicLibrary.find(
-            song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
-        );
-        if(currentSongData && currentSongData.metadata?.common?.title) {
-            songTitle.innerText = currentSongData.metadata.common.title;
-        } else {
-            songTitle.innerText = 'Unknown title';
-        }
-        activeSong.classList.add('greenText');
+        updateSongDisplay();
     } else {
         audioPlayer.pause();
         playPauseBtn.innerText = 'Play';
