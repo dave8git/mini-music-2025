@@ -1,4 +1,3 @@
-
 const audioElementsList = document.getElementById('sidebar');
 const musicList = document.getElementById('music-list');
 const fileCount = document.getElementById('file-count');
@@ -60,7 +59,7 @@ document.getElementById('upload').addEventListener('click', async () => {
 });
 
 clearButton.addEventListener('click', () => {
-
+    playPauseBtn.disabled = true;
     musicList.innerHTML = '';
     fileSet.clear();
     notification.message = 'Lista zosta?a wyczyszczona ??';
@@ -70,6 +69,7 @@ clearButton.addEventListener('click', () => {
 });
 
 function addFileList(filesArr) {
+    playPauseBtn.disabled = false;
     filesArr.forEach((file) => { // forEach wype?nia fileSeta, ?eby pozbyc sie duplikat?w
         const filePath = file.file;
         if (!fileSet.has(filePath)) {
@@ -88,21 +88,20 @@ function addFileList(filesArr) {
         const currentFile = musicLibrary.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek kt?ry r?wna si? obecnej ?cie?ce z fileSet
         liItem.innerHTML = currentFile.metadata.common.title; // filesArr pochodzi z maina z piosenkami a filePath to ?cie?ka unikalna
         liItem.dataset.filePath = filePath;
-        liItem.dataset.fileSong = cleanUpFileURL(filePath);
+        liItem.dataset.index = musicLibrary.findIndex(f => f.file === filePath);
         fragment.appendChild(liItem); // dodaje item LI do fragment
     });
 
     const firstSong = fileSet.values().next().value; // przy inicjalizacji listy wrzucamy playerowi pierwsz± zaczytan± ¶cie¿kê (piosenkê)
     audioPlayer.src = firstSong; // teraz bêzie gra³ jak go siê wywo³a w³asnie tê piosenkê. 
-    audioPlayer.dataset.currentSong = cleanUpFileURL(firstSong);
+    audioPlayer.dataset.currentIndex = musicLibrary.findIndex(f => f.file === firstSong); //cleanUpFileURL(firstSong);
     musicList.appendChild(fragment); // po mapie dodaje wszystkie piosenki kt?re sa teraz we frgamencie do musicList
     // doda? audio w HTML, z?apa? je, i doda? SRC ?cie?k?
 };
 
 function updateSongDisplay() {
-    const currentSongData = musicLibrary.find(
-        song => cleanUpFileURL(song.file) === audioPlayer.dataset.currentSong
-    );
+    const currentIndex = parseInt(audioPlayer.dataset.currentIndex, 10);
+    const currentSongData = musicLibrary[currentIndex];
 
     if(currentSongData && currentSongData.metadata?.common) {
         songTitle.innerText = currentSongData.metadata.common.title;
@@ -111,16 +110,17 @@ function updateSongDisplay() {
     };
 
     document.querySelectorAll('@music-list li').forEach(li => li.classList.remove('greenText'));
-    const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+    const activeSong = document.querySelector(`[data-index=${currentIndex}]`); //document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
     if (activeSong) activeSong.classList.add('greenText');
 };
 
 musicList.addEventListener('click', async (e) => { // dodaje eventListner do
     if (e.target.tagName === 'LI') {
-        //console.log(e.target.dataset.filePath);
-        const songURL = await window.electronAPI.getFileURL(e.target.dataset.filePath);
+        const index = e.target.dataset.index;
+        const songData = musicLibrary[index];
+        const songURL = await window.electronAPI.getFileURL(songData.file);
         audioPlayer.src = songURL;
-        audioPlayer.dataset.currentSong = cleanUpFileURL(e.target.dataset.filePath);
+        audioPlayer.dataset.currentIndex = index;
         audioPlayer.play();
 
         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText')); // przechodzi po wszystkich elementach i usuwa klasê greentext
@@ -129,13 +129,12 @@ musicList.addEventListener('click', async (e) => { // dodaje eventListner do
     }
 });
 
-function cleanUpFileURL(s) {
-    return s.replaceAll("/", "_").replaceAll(":", "").replaceAll(" ", "_").replaceAll("\\", "_").replaceAll(".", "");
-};
-
 playPauseBtn.addEventListener('click', async () => {
     if (audioPlayer.paused) {
-        audioPlayer.play();
+        audioPlayer.play().catch(err => {
+            console.error('Failed to play:' )
+            notification.message = 'Nie mo¿na otworzyæ pliku';
+        });
         playPauseBtn.innerText = 'Pause';
         const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
         updateSongDisplay();
@@ -159,16 +158,17 @@ audioPlayer.addEventListener('error', (e) => {
     console.error('Playback error:', e);
 });
 
+audioPlayer.volume = 0.5;
+volumeSlider.value = 50;
+
 volumeSlider.addEventListener('input', (e) => {
     audioPlayer.volume = e.target.value / 100;
     console.log('volumeSlider moved');
 });
 
-audioPlayer.volume = 0.5;
-volumeSlider.value = 50;
-
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Renderer is working ?');
+    playPauseBtn.disabled = true;
 
     if (window.electronAPI) {
         console.log('Electron API jest dost?pne:', window.electronAPI);
