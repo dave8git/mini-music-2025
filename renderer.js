@@ -7,6 +7,9 @@ const playPauseBtn = document.getElementById('play-pause-btn');
 const stopBtn = document.getElementById('stop-btn');
 const volumeSlider = document.getElementById('volume-slider');
 const songTitle = document.getElementById('song-title');
+const currentTimeElement = document.getElementById('current-time');
+const progressBar = document.getElementById('progress-bar');
+const duration = document.getElementById('duration');
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 let progressStatus = 'idle';
@@ -48,6 +51,42 @@ const notification = { // na podstawie tego obiektu getter?w i setter?w zrobi? n
         return this._message;
     }
 };
+
+function formatTime(seconds) {
+    // je¿eli warto¶æ seconds jest niew³a¶ciwa zwróæ: 0:00
+    if (isNaN(seconds) || seconds < 0) return "0:00";
+
+    seconds = Math.floor(seconds);
+
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const paddedSecs = secs.toString().padStart(2, '0');
+
+    // If shorter than 1 hour --> "M:SS"
+    if (hrs === 0) {
+        return `${mins}:${paddedSecs}`;
+    }
+
+    // For long files --> "H:MM:SS"
+    const paddedMins = mins.toString().padStart(2, '0');
+    return `${hrs}:${paddedMins}:${paddedSecs}`;
+};
+
+audioPlayer.addEventListener('loadedmetadata', () => {
+    const d = audioPlayer.duration;
+    const ct = audioPlayer.currentTime;
+    currentTimeElement.innerText = isNaN(d) ? "0:00" : formatTime(d);
+});
+
+audioPlayer.addEventListener('timeupdate', () => {
+    let percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    console.log('percentage: ', percentage);
+    //console.log('audioPlayer.currentTime', audioPlayer.currentTime);
+    //console.log('audioPlayer.duration', audioPlayer.duration);
+    progressBar.value = percentage;
+});
 
 document.getElementById('upload').addEventListener('click', async () => {
     state.progressStatus = 'in-progress';
@@ -103,13 +142,13 @@ function updateSongDisplay() {
     const currentIndex = parseInt(audioPlayer.dataset.currentIndex, 10);
     const currentSongData = musicLibrary[currentIndex];
 
-    if(currentSongData && currentSongData.metadata?.common) {
+    if (currentSongData && currentSongData.metadata?.common) {
         songTitle.innerText = currentSongData.metadata.common.title;
     } else {
         songTitle.innerText = 'Uknown Title';
     };
 
-    document.querySelectorAll('@music-list li').forEach(li => li.classList.remove('greenText'));
+    document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
     const activeSong = document.querySelector(`[data-index=${currentIndex}]`); //document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
     if (activeSong) activeSong.classList.add('greenText');
 };
@@ -132,7 +171,7 @@ musicList.addEventListener('click', async (e) => { // dodaje eventListner do
 playPauseBtn.addEventListener('click', async () => {
     if (audioPlayer.paused) {
         audioPlayer.play().catch(err => {
-            console.error('Failed to play:' )
+            console.error('Failed to play:')
             notification.message = 'Nie mo¿na otworzyæ pliku';
         });
         playPauseBtn.innerText = 'Pause';
@@ -141,7 +180,7 @@ playPauseBtn.addEventListener('click', async () => {
     } else {
         audioPlayer.pause();
         playPauseBtn.innerText = 'Play';
-         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
+        document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
     }
 });
 
