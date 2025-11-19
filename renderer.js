@@ -85,6 +85,8 @@ audioPlayer.addEventListener('timeupdate', () => {
     console.log('percentage: ', percentage);
     //console.log('audioPlayer.currentTime', audioPlayer.currentTime);
     //console.log('audioPlayer.duration', audioPlayer.duration);
+    currentTimeElement.innerText = formatTime(audioPlayer.currentTime);
+    console.log('timeupdate formatTime', formatTime(audioPlayer.currentTime));
     progressBar.value = percentage;
 });
 
@@ -124,32 +126,17 @@ async function addFileList(filesArr) {
     musicList.innerHTML = '';
     const fragment = document.createDocumentFragment(); // tworzy fragment b?dzie w pami?ci kontenerem dla piosenke
 
-    // [...fileSet].map((filePath) => { // przechodzi po fileSet, po kolei przez wszystkie scie?ki w fileSet
-    //     const liItem = document.createElement('li'); // tworzy element li
-    //     const currentFile = musicLibrary.find(file => file.file === filePath); // zzwraca element z tablicy pziosenek kt?ry r?wna si? obecnej ?cie?ce z fileSet
-    //     liItem.innerHTML = currentFile.metadata.common.title; // filesArr pochodzi z maina z piosenkami a filePath to ?cie?ka unikalna
-    //     liItem.dataset.filePath = filePath;
-    //     liItem.dataset.index = musicLibrary.findIndex(f => f.file === filePath);
-    //     fragment.appendChild(liItem); // dodaje item LI do fragment
-    // });
-
     musicLibrary.forEach((song, index) => {
         const liItem = document.createElement('li');
         liItem.innerText = song.metadata.common.title || 'Unknown Title';
-        liItem.dataset.index = index;
+        console.log('song.metadata', song.metadata);
+        liItem.dataset.id = song.metadata.common.year + '-' + song.metadata.format.duration;
         fragment.appendChild(liItem);
-
     });
-
     if (musicLibrary.length > 0) {
         audioPlayer.src = musicLibrary[0].url;
-        audioPlayer.dataset.currentIndex = 0;
     }
-    // const firstSong = fileSet.values().next().value; // przy inicjalizacji listy wrzucamy playerowi pierwsz± zaczytan± ¶cie¿kê (piosenkê)
-    // audioPlayer.src = firstSong; // teraz bêzie gra³ jak go siê wywo³a w³asnie tê piosenkê. 
-    // audioPlayer.dataset.currentIndex = musicLibrary.findIndex(f => f.file === firstSong); //cleanUpFileURL(firstSong);
     musicList.appendChild(fragment); // po mapie dodaje wszystkie piosenki kt?re sa teraz we frgamencie do musicList
-    // doda? audio w HTML, z?apa? je, i doda? SRC ?cie?k?
 };
 
 function updateSongDisplay() {
@@ -169,11 +156,10 @@ function updateSongDisplay() {
 
 musicList.addEventListener('click', async (e) => { // dodaje eventListner do
     if (e.target.tagName === 'LI') {
-        const index = e.target.dataset.index;
-        const songData = musicLibrary[index];
+        const id = e.target.dataset.id;
+        const songData = musicLibrary.find(f => f.metadata.common.year + '-' + f.metadata.format.duration === id); //musicLibrary[index];
         const songURL = await window.electronAPI.getFileURL(songData.file);
         audioPlayer.src = songURL;
-        audioPlayer.dataset.currentIndex = index;
         audioPlayer.play();
 
         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText')); // przechodzi po wszystkich elementach i usuwa klasê greentext
