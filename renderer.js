@@ -10,9 +10,10 @@ const songTitle = document.getElementById('song-title');
 const currentTimeElement = document.getElementById('current-time');
 const progressBar = document.getElementById('progress-bar');
 const duration = document.getElementById('duration');
+const nextButton = document.getElementById('next-btn');
+const prevButton = document.getElementById('prev-btn');
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
-let progressStatus = 'idle';
 
 const state = { // ten obiekt obs?uguje nam spinner - idle
     _progressStatus: 'idle',
@@ -76,17 +77,20 @@ function formatTime(seconds) {
 
 audioPlayer.addEventListener('loadedmetadata', () => {
     const d = audioPlayer.duration;
-    const ct = audioPlayer.currentTime;
-    currentTimeElement.innerText = isNaN(d) ? "0:00" : formatTime(d);
+    progressBar.value = audioPlayer.currentTime; // ustawia progress bar na pocz±tku na 0
+    duration.innerText = formatTime(d);
 });
+
+progressBar.addEventListener('input', (e) => {
+    const percentage = progressBar.value; // aktualny miejsce na pasku progressBar
+    const newTime = (percentage / 100) * audioPlayer.duration;
+    audioPlayer.currentTime = newTime;
+    progressBar.value = newTime;
+})
 
 audioPlayer.addEventListener('timeupdate', () => {
     let percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-    console.log('percentage: ', percentage);
-    //console.log('audioPlayer.currentTime', audioPlayer.currentTime);
-    //console.log('audioPlayer.duration', audioPlayer.duration);
     currentTimeElement.innerText = formatTime(audioPlayer.currentTime);
-    console.log('timeupdate formatTime', formatTime(audioPlayer.currentTime));
     progressBar.value = percentage;
 });
 
@@ -130,7 +134,7 @@ async function addFileList(filesArr) {
         const liItem = document.createElement('li');
         liItem.innerText = song.metadata.common.title || 'Unknown Title';
         console.log('song.metadata', song.metadata);
-        liItem.dataset.id = song.metadata.common.year + '-' + song.metadata.format.duration;
+        liItem.dataset.id = song.file;
         fragment.appendChild(liItem);
     });
     if (musicLibrary.length > 0) {
@@ -154,10 +158,30 @@ function updateSongDisplay() {
     if (activeSong) activeSong.classList.add('greenText');
 };
 
+function getSongById(id) {
+    return musicLibrary.find(s => s.file === id);
+};
+
+function getIndexById(id) {
+    return musicLibrary.findIndex(song => song.url === id);
+};
+
+function getSongByCurrentIndex(index) {
+    return musicLibrary[index];
+};
+
+function getSongByURL(url) {
+    return musicLibrary.find(u => u.url === url);
+}
+
+// deleteButton.addEventListener('click', () => {
+
+// })
+
 musicList.addEventListener('click', async (e) => { // dodaje eventListner do
     if (e.target.tagName === 'LI') {
         const id = e.target.dataset.id;
-        const songData = musicLibrary.find(f => f.metadata.common.year + '-' + f.metadata.format.duration === id); //musicLibrary[index];
+        const songData = getSongById(id);
         const songURL = await window.electronAPI.getFileURL(songData.file);
         audioPlayer.src = songURL;
         audioPlayer.play();
@@ -165,7 +189,10 @@ musicList.addEventListener('click', async (e) => { // dodaje eventListner do
         document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText')); // przechodzi po wszystkich elementach i usuwa klasê greentext
         e.target.classList.add('greenText');
         updateSongDisplay();
-    }
+    };
+    //if(e.target.tagName === 'BUTTON') {
+
+    //}
 });
 
 playPauseBtn.addEventListener('click', async () => {
@@ -175,7 +202,7 @@ playPauseBtn.addEventListener('click', async () => {
             notification.message = 'Nie mo¿na otworzyæ pliku';
         });
         playPauseBtn.innerText = 'Pause';
-        const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+        //const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
         updateSongDisplay();
     } else {
         audioPlayer.pause();
@@ -184,6 +211,29 @@ playPauseBtn.addEventListener('click', async () => {
     }
 });
 
+nextButton.addEventListener('click', () => {
+    const currentSong = getSongByURL(audioPlayer.src);
+    const currentSongIndex = getIndexById(currentSong.url);
+    console.log('currentSong', currentSong);
+    console.log('currentSongIndex', currentSongIndex);
+    if(currentSongIndex < musicLibrary.length - 1) {
+        audioPlayer.src = getSongByCurrentIndex(currentSongIndex + 1).url; // napisac playSongByIndex()
+       // audioPlayer.dataset.currentId = 
+        audioPlayer.play();
+    }
+});
+
+prevButton.addEventListener('click', () => {
+    console.log('prevBtn');
+    const currentSong = getSongByURL(audioPlayer.src);
+    const currentSongIndex = getIndexById(currentSong.url);
+
+    console.log('musicLibrary.length', musicLibrary.length);
+    if (currentSongIndex < musicLibrary.length - 1) {
+        audioPlayer.src = getSongByCurrentIndex(currentSongIndex - 1).url;
+        audioPlayer.play();
+    }
+})
 audioPlayer.addEventListener('ended', () => {
     stopPlayback();
 });
