@@ -12,6 +12,8 @@ const progressBar = document.getElementById('progress-bar');
 const duration = document.getElementById('duration');
 const nextButton = document.getElementById('next-btn');
 const prevButton = document.getElementById('prev-btn');
+const songDisplay = document.getElementById('songDisplay');
+// const
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 
@@ -133,7 +135,7 @@ async function addFileList(filesArr) {
     musicLibrary.forEach((song, index) => {
         const liItem = document.createElement('li');
         liItem.innerText = song.metadata.common.title || 'Unknown Title';
-        console.log('song.metadata', song.metadata);
+        //console.log('song.metadata', song.metadata);
         liItem.dataset.id = song.file;
         fragment.appendChild(liItem);
     });
@@ -144,19 +146,44 @@ async function addFileList(filesArr) {
 };
 
 function updateSongDisplay() {
-    const currentIndex = parseInt(audioPlayer.dataset.currentIndex, 10);
+    const currentSong = getSongByURL(audioPlayer.src);
+    const currentSongIndex = getIndexById(currentSong.url);
+    const currentIndex = parseInt(currentSongIndex, 10);
     const currentSongData = musicLibrary[currentIndex];
-
     if (currentSongData && currentSongData.metadata?.common) {
         songTitle.innerText = currentSongData.metadata.common.title;
     } else {
         songTitle.innerText = 'Uknown Title';
     };
-
     document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
-    const activeSong = document.querySelector(`[data-index=${currentIndex}]`); //document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
+    const safe = CSS.escape(currentSongData.file); // CSS.escape: escapes all special sign, przerabia backslashe, dziala we wszystkich przegladarkach + electron
+    const activeSong = document.querySelector(`[data-id="${safe}"]`); // nalezy umiescic cudzyslowy dooko³a wartosci: ${safe}
+    //document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
     if (activeSong) activeSong.classList.add('greenText');
 };
+
+function getMetadataForCurrentSong() {
+    const currentSong = getSongByURL(audioPlayer.src);
+    const currentSongIndex = getIndexById(currentSong.url);
+    const currentIndex = parseInt(currentSongIndex, 10);
+    const currentSongData = musicLibrary[currentIndex];
+    return currentSongData.metadata;
+}
+
+function songDisplayShow() {
+    const metadata = getMetadataForCurrentSong(); 
+    const ul = document.createElement('ul');
+
+    console.log('metadata', metadata);
+    // const selectedMetadata = {
+    //     title: 
+    // };
+
+    // forEach(() => {
+    //       const li = document.createElement('li');
+
+    // });
+}
 
 function getSongById(id) {
     return musicLibrary.find(s => s.file === id);
@@ -204,6 +231,7 @@ playPauseBtn.addEventListener('click', async () => {
         playPauseBtn.innerText = 'Pause';
         //const activeSong = document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
         updateSongDisplay();
+        songDisplayShow();
     } else {
         audioPlayer.pause();
         playPauseBtn.innerText = 'Play';
@@ -214,13 +242,12 @@ playPauseBtn.addEventListener('click', async () => {
 nextButton.addEventListener('click', () => {
     const currentSong = getSongByURL(audioPlayer.src);
     const currentSongIndex = getIndexById(currentSong.url);
-    console.log('currentSong', currentSong);
-    console.log('currentSongIndex', currentSongIndex);
     if(currentSongIndex < musicLibrary.length - 1) {
         audioPlayer.src = getSongByCurrentIndex(currentSongIndex + 1).url; // napisac playSongByIndex()
        // audioPlayer.dataset.currentId = 
         audioPlayer.play();
     }
+    updateSongDisplay();
 });
 
 prevButton.addEventListener('click', () => {
@@ -233,7 +260,8 @@ prevButton.addEventListener('click', () => {
         audioPlayer.src = getSongByCurrentIndex(currentSongIndex - 1).url;
         audioPlayer.play();
     }
-})
+    updateSongDisplay();
+});
 audioPlayer.addEventListener('ended', () => {
     stopPlayback();
 });
