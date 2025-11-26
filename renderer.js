@@ -296,8 +296,9 @@ deleteButton.addEventListener('click', async () => {
     await new Promise(res => setTimeout(res, 50));
 
     const deleteFile = await window.electronAPI.deleteFile(filePath);
-    
+
     console.log('deletedFIle', deleteFile);
+       document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
 });
 
 window.addEventListener('DOMContentLoaded', () => {
