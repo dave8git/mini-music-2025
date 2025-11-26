@@ -2,6 +2,7 @@ const audioElementsList = document.getElementById('sidebar');
 const musicList = document.getElementById('music-list');
 const fileCount = document.getElementById('file-count');
 const clearButton = document.getElementById('clear');
+const deleteButton = document.getElementById('delete');
 const audioPlayer = document.getElementById('audioPlayer');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const stopBtn = document.getElementById('stop-btn');
@@ -13,7 +14,11 @@ const duration = document.getElementById('duration');
 const nextButton = document.getElementById('next-btn');
 const prevButton = document.getElementById('prev-btn');
 const songDisplay = document.getElementById('songDisplay');
-// const
+const songDisplayTitle = document.getElementById('songTitle');
+const songDisplayArtist = document.getElementById('songArtist');
+const songDisplayAlbum = document.getElementById('songAlbum');
+const songDisplayYear = document.getElementById('songYear');
+const songDisplayGenre = document.getElementById('songGenre');
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 
@@ -160,6 +165,7 @@ function updateSongDisplay() {
     const activeSong = document.querySelector(`[data-id="${safe}"]`); // nalezy umiescic cudzyslowy dooko³a wartosci: ${safe}
     //document.querySelector(`[data-file-song^="${audioPlayer.dataset.currentSong}"]`);
     if (activeSong) activeSong.classList.add('greenText');
+    songDisplayShow();
 };
 
 function getMetadataForCurrentSong() {
@@ -172,17 +178,12 @@ function getMetadataForCurrentSong() {
 
 function songDisplayShow() {
     const metadata = getMetadataForCurrentSong(); 
-    const ul = document.createElement('ul');
-
-    console.log('metadata', metadata);
-    // const selectedMetadata = {
-    //     title: 
-    // };
-
-    // forEach(() => {
-    //       const li = document.createElement('li');
-
-    // });
+    console.log('currrentSongMetadata', metadata);
+    songDisplayTitle.textContent = metadata?.common.title || "Unknown title";
+    songDisplayArtist.textContent = metadata?.common.artist || "Unknown artist";
+    songDisplayAlbum.textContent = metadata?.common.album || "Unknown title";
+    songDisplayYear.textContent = metadata?.common.year || "Unknown artist";
+    songDisplayGenre.textContent = metadata?.common.genre || "Unknown title";
 }
 
 function getSongById(id) {
@@ -281,6 +282,10 @@ volumeSlider.value = 50;
 volumeSlider.addEventListener('input', (e) => {
     audioPlayer.volume = e.target.value / 100;
     console.log('volumeSlider moved');
+});
+
+deleteButton.addEventListener('click', () => {
+    
 });
 
 window.addEventListener('DOMContentLoaded', () => {

@@ -247,6 +247,33 @@ body.in-progress::after {
   transform: scale(0.97);
 }
 
+/* delete songs button */
+#delete {
+  background-color: #cf1a06; /* red base color */
+  color: var(--text-color);
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 20px auto;
+  display: block;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+#delete:hover {
+  background-color: #9e271a;
+  transform: scale(1.05);
+}
+
+#delete:active {
+  background-color: #c0392b;
+  transform: scale(0.97);
+}
+
+
 /* Align both buttons horizontally */
 .loader {
   display: flex;
@@ -282,4 +309,55 @@ body.in-progress::after {
 /* selected song */
 .greenText {
   color: green;
+}
+
+/* ========== Song Display (Metadata Panel) ========== */
+.songDisplay {
+  background-color: var(--item-bg);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.songDisplay ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.songDisplay li {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: var(--item-bg-alt);
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.songDisplay li:hover {
+  background-color: var(--item-hover-bg);
+}
+
+.songDisplay li div:first-child {
+  font-weight: bold;
+  color: var(--accent-color);
+  min-width: 80px;
+  margin-right: 12px;
+}
+
+.songDisplay li div:last-child {
+  flex: 1;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+/* Empty state styling */
+.songDisplay li div:last-child:empty::after {
+  content: "—";
+  opacity: 0.5;
 }

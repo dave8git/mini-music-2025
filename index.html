@@ -35,16 +35,30 @@
             <ul>
                 <li>
                     <div>Title:</div>
-                    <div class="songTitle"></div>
+                    <div id="songTitle"></div>
                 </li>
-                <li class="artist">
-                    <div class="songArtist"></div>
+                <li>
+                    <div>Artist:</div>
+                    <div id="songArtist"></div>
+                </li>
+                <li>
+                    <div>Album:</div>
+                    <div id="songAlbum"></div>
+                </li>
+                <li>
+                    <div>Year:</div>
+                    <div id="songYear"></div>
+                </li>
+                <li>
+                    <div>Genre:</div>
+                    <div id="songGenre"></div>
                 </li>
             </ul>
         </div>
         <div class="loader">
             <button id="upload">Select files</button>
             <button id="clear">Clear list</button>
+            <button id="delete">Delete song</button>
             <span id="file-count" class="notification"
                 style="margin-left: 10px; font-weight: bold; margin-bottom: 10px">Hey dodaj jakieś piosenki... bo tak
                 jakoś pusto na tej playliście 😄 🎶</span>
@@ -74,5 +88,4 @@
     </div>
     <script src="renderer.js"></script>
 </body>
-
 </html>
