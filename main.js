@@ -1,5 +1,5 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
-const fs = require('fs').promises;
+const fs = require('fs/promises');
 const mm = require('music-metadata');
 const path = require('path');
 const { pathToFileURL } = require('url');
@@ -76,4 +76,13 @@ app.on('activate', () => {
     }
 });
 
-ipcMain.handle
+ipcMain.handle('delete-file', async (event, filePath) => {
+    console.log('filePath', filePath);
+    try {
+        await fs.unlink(filePath);
+        return { success: true };
+    } catch (err) {
+        console.error('Failed to delete file:', err);
+        return { success: false, error: err.message };
+    }
+});

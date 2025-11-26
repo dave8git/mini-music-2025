@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadFiles: (files) => ipcRenderer.invoke('uploadFiles'), // ipcRenderer - inter process communicationl, tutaj komunikacja pomiędzy mainem a rendererem z użyciem preloada, czyli renderer wywołuje
     // getMetaData
     getFileURL: (filePath) => ipcRenderer.invoke('get-file-url', filePath),
+    deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
     appName: 'Mini Music Player'
 });
 

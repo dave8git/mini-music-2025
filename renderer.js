@@ -177,7 +177,7 @@ function getMetadataForCurrentSong() {
 }
 
 function songDisplayShow() {
-    const metadata = getMetadataForCurrentSong(); 
+    const metadata = getMetadataForCurrentSong();
     console.log('currrentSongMetadata', metadata);
     songDisplayTitle.textContent = metadata?.common.title || "Unknown title";
     songDisplayArtist.textContent = metadata?.common.artist || "Unknown artist";
@@ -243,9 +243,9 @@ playPauseBtn.addEventListener('click', async () => {
 nextButton.addEventListener('click', () => {
     const currentSong = getSongByURL(audioPlayer.src);
     const currentSongIndex = getIndexById(currentSong.url);
-    if(currentSongIndex < musicLibrary.length - 1) {
+    if (currentSongIndex < musicLibrary.length - 1) {
         audioPlayer.src = getSongByCurrentIndex(currentSongIndex + 1).url; // napisac playSongByIndex()
-       // audioPlayer.dataset.currentId = 
+        // audioPlayer.dataset.currentId = 
         audioPlayer.play();
     }
     updateSongDisplay();
@@ -284,8 +284,20 @@ volumeSlider.addEventListener('input', (e) => {
     console.log('volumeSlider moved');
 });
 
-deleteButton.addEventListener('click', () => {
+deleteButton.addEventListener('click', async () => {
+    const currentSong = getSongByURL(audioPlayer.src);
+    if(!currentSong) return;
+    const filePath = currentSong.file;
+
+    audioPlayer.pause();
+    audioPlayer.src = '';
+    audioPlayer.load();
     
+    await new Promise(res => setTimeout(res, 50));
+
+    const deleteFile = await window.electronAPI.deleteFile(filePath);
+    
+    console.log('deletedFIle', deleteFile);
 });
 
 window.addEventListener('DOMContentLoaded', () => {
