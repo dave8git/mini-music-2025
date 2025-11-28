@@ -19,6 +19,7 @@ const songDisplayArtist = document.getElementById('songArtist');
 const songDisplayAlbum = document.getElementById('songAlbum');
 const songDisplayYear = document.getElementById('songYear');
 const songDisplayGenre = document.getElementById('songGenre');
+
 let musicLibrary = [];
 let fileSet = new Set(); // nie da si? raz zrobi? new Set(), po co powtarza? ni?ej w funkcji? 
 
@@ -286,22 +287,26 @@ volumeSlider.addEventListener('input', (e) => {
 
 deleteButton.addEventListener('click', async () => {
     const currentSong = getSongByURL(audioPlayer.src);
-    if(!currentSong) return;
+    if (!currentSong) return;
     const filePath = currentSong.file;
 
     audioPlayer.pause();
     audioPlayer.src = '';
     audioPlayer.load();
-    
+
     await new Promise(res => setTimeout(res, 50));
 
     const deleteFile = await window.electronAPI.deleteFile(filePath);
 
     console.log('deletedFIle', deleteFile);
-       document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
+    document.querySelectorAll('#music-list li').forEach(li => li.classList.remove('greenText'));
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+    let buttonsAvailable = [clearButton, deleteButton, playPauseBtn, stopBtn, volumeSlider, nextButton, prevButton];
+    if (musicLibrary.length <= 0) {
+        buttonsAvailable.forEach((button) => button.disabled = true);
+    }
     console.log('Renderer is working ?');
     playPauseBtn.disabled = true;
 
